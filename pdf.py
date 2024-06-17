@@ -144,7 +144,6 @@ def main():
     input_csv = 'SpoljnaRasveta2.csv'
     output_pdf = 'Final3.pdf'  # Output PDF file name
 
-
     df = read_csv(input_csv)
 
     # Extract the base name of the CSV file without the extension for the title
