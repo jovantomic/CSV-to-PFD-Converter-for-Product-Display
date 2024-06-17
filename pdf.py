@@ -140,8 +140,8 @@ def generate_pdf(df, output_file, title):
     c.save()
 
 def main():
-    input_csv = 'SpoljnaRasveta2.csv'
-    output_pdf = 'Final3.pdf'  # Output PDF file name
+    input_csv = 'SpoljnaRasveta.csv'
+    output_pdf = 'Final.pdf'  # Output PDF file name
 
     df = read_csv(input_csv)
 
