@@ -140,8 +140,13 @@ def generate_pdf(df, output_file, title):
     c.save()
 
 def main():
+<<<<<<<<< Temporary merge branch 1
+    input_csv = 'SpoljnaRasveta.csv'
+    output_pdf = 'Final.pdf'  # Output PDF file name
+=========
     input_csv = 'SpoljnaRasveta2.csv'
-    output_pdf = 'Final4.pdf'  # Output PDF file name
+    output_pdf = 'Final3.pdf'  # Output PDF file name
+>>>>>>>>> Temporary merge branch 2
 
     df = read_csv(input_csv)
 
