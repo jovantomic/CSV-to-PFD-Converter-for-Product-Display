@@ -84,7 +84,7 @@ def generate_pdf(df, output_file, title):
                 img_y = y - container_height + (container_height - img_height) / 2  # Center the image vertically
                 c.drawImage(image, img_x, img_y, width=img_width, height=img_height, preserveAspectRatio=True)
 
-        # Determine the icon based on the 'Grlo' column
+        # Determine the icon based on the 'Grlo' column ZELENI KVADRATIC
         icon_path = None
         if 'Grlo' in df.columns and pd.notna(row['Grlo']):
             if row['Grlo'].strip().lower() == 'e27':
