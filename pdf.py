@@ -58,19 +58,19 @@ def generate_pdf(df, output_file, title):
     
     # Add title on the first page
     c.setFont("DejaVuSans-Bold", 16)
-    c.drawCentredString(width / 2.0, height - 40, title)
+    c.drawCentredString(width / 2.0, height - 30, title)
 
     # Add subtitle on the first page
-    c.setFont("DejaVuSans-Bold", 12)
-    c.drawCentredString(width / 2.0, height - 60, "Leuci Centar")
+    c.setFont("DejaVuSans-Bold", 14)
+    c.drawCentredString(width / 2.0, height - 50, "Leuci Centar")
 
-    c.setFont("DejaVuSans", 10)
+    c.setFont("DejaVuSans", 12)
 
-    y = height - 100  # Adjust Y position for content, accounting for the subtitle
+    y = height - 60  # Adjust Y position for content, accounting for the subtitle
     line_height = 12  # Height for each line of text
     text_spacing = 8  # Spacing between different text blocks
 
-    container_height = 200
+    container_height = 180
 
     colors_cycle = [colors.HexColor("#E0F7FA"), colors.white]  # Light blue and white
     color_index = 0
@@ -120,11 +120,11 @@ def generate_pdf(df, output_file, title):
         if 'Opis' in df.columns and pd.notna(row['Opis']):
             description = row['Opis']
             while description:
-                if len(description) <= 60:
+                if len(description) <= 70:
                     c.drawString(text_x, text_y, description)
                     description = ""
                 else:
-                    for i in range(60, 0, -1):
+                    for i in range(70, 0, -1):
                         if description[i] == ' ':
                             break
                     c.drawString(text_x, text_y, description[:i])
