@@ -53,9 +53,9 @@ def generate_pdf(df, output_file, title):
     # Register and set the TrueType fonts
     pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
     pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
+    
+    # Add title on the first page
     c.setFont("DejaVuSans-Bold", 16)
-
-    # Add title
     c.drawCentredString(width / 2.0, height - 40, title)
 
     c.setFont("DejaVuSans", 10)
@@ -65,13 +65,15 @@ def generate_pdf(df, output_file, title):
     text_spacing = 8  # Spacing between different text blocks
 
     container_height = 180
-    container_spacing = 15  # Reduced spacing between containers
+
+    colors_cycle = [colors.HexColor("#E0F7FA"), colors.white]  # Light blue and white
+    color_index = 0
 
     for index, row in df.iterrows():
-        # Draw border for product
-        c.setStrokeColor(colors.black)
-        c.setLineWidth(1)
-        c.rect(20, y - container_height, width - 40, container_height, stroke=True, fill=False)
+        # Set the background color
+        c.setFillColor(colors_cycle[color_index])
+        c.rect(0, y - container_height, width, container_height, stroke=False, fill=True)
+        color_index = (color_index + 1) % 2
 
         # Download and draw the image
         if 'Slika' in df.columns and pd.notna(row['Slika']):
@@ -84,7 +86,7 @@ def generate_pdf(df, output_file, title):
                 img_y = y - container_height + (container_height - img_height) / 2  # Center the image vertically
                 c.drawImage(image, img_x, img_y, width=img_width, height=img_height, preserveAspectRatio=True)
 
-        # Determine the icon based on the 'Grlo' column ZELENI KVADRATIC
+        # Determine the icon based on the 'Grlo' column
         icon_path = None
         if 'Grlo' in df.columns and pd.notna(row['Grlo']):
             if row['Grlo'].strip().lower() == 'e27':
@@ -98,6 +100,7 @@ def generate_pdf(df, output_file, title):
 
         if 'Ime' in df.columns and pd.notna(row['Ime']):
             c.setFont("DejaVuSans-Bold", 12)
+            c.setFillColor(colors.black)  # Set text color to black
             c.drawString(text_x, text_y, f"{row['Ime']}")
             text_y -= line_height + text_spacing
             c.setFont("DejaVuSans", 10)
@@ -127,22 +130,19 @@ def generate_pdf(df, output_file, title):
             draw_icon(c, text_x, text_y - icon_size - 2, icon_size, icon_path)
             text_y -= icon_size + text_spacing
 
-        y -= container_height + container_spacing  # Move to the next product position
+        y -= container_height  # Move to the next product position
 
         # Check if enough space is available for the next item
-        if y < container_height + container_spacing:
+        if y < container_height:
             c.showPage()  # Start new page if not enough space
-            y = height - 80  # Reset Y position for new page
-            c.setFont("DejaVuSans-Bold", 16)
-            c.drawCentredString(width / 2.0, height - 40, title)
+            y = height - 40  # Reset Y position for new page, but do not add title
             c.setFont("DejaVuSans", 10)
 
     c.save()
 
 def main():
-
     input_csv = 'SpoljnaRasveta2.csv'
-    output_pdf = 'Final3.pdf'  # Output PDF file name
+    output_pdf = 'Final5.pdf'  # Output PDF file name
 
     df = read_csv(input_csv)
 
