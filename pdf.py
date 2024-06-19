@@ -46,7 +46,6 @@ def draw_icon(c, x, y, size, icon_path):
     c.drawImage(icon_reader, x, y, width=size, height=size, mask='auto')
 
 
-
 def generate_pdf(df, output_file, title):
     """Generate PDF from DataFrame."""
     c = canvas.Canvas(output_file, pagesize=letter)
@@ -57,11 +56,11 @@ def generate_pdf(df, output_file, title):
     pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
     
     # Add title on the first page
-    c.setFont("DejaVuSans-Bold", 16)
+    c.setFont("DejaVuSans-Bold", 18)
     c.drawCentredString(width / 2.0, height - 30, title)
 
     # Add subtitle on the first page
-    c.setFont("DejaVuSans-Bold", 14)
+    c.setFont("DejaVuSans-Bold", 16)
     c.drawCentredString(width / 2.0, height - 50, "Leuci Centar")
 
     c.setFont("DejaVuSans", 12)
@@ -70,7 +69,7 @@ def generate_pdf(df, output_file, title):
     line_height = 12  # Height for each line of text
     text_spacing = 8  # Spacing between different text blocks
 
-    container_height = 180
+    container_height = 150
 
     colors_cycle = [colors.HexColor("#E0F7FA"), colors.white]  # Light blue and white
     color_index = 0
@@ -92,15 +91,24 @@ def generate_pdf(df, output_file, title):
                 img_y = y - container_height + (container_height - img_height) / 2  # Center the image vertically
                 c.drawImage(image, img_x, img_y, width=img_width, height=img_height, preserveAspectRatio=True)
 
-        # Determine the icon based on the 'Grlo' column
-        icon_path = None
-        icon_description = ''
+        # Determine the icons based on the 'Rok Isporuke' and 'Grlo' columns
+        delivery_icon_path = 'delivery.png'  # Set your delivery icon path here
+        delivery_icon_description = ''
+        if 'Rok Isporuke' in df.columns and pd.notna(row['Rok Isporuke']):
+            delivery_icon_description = row['Rok Isporuke']
+
+        socket_icon_path = None
+        socket_icon_description = ''
         if 'Grlo' in df.columns and pd.notna(row['Grlo']):
-            icon_description = row['Grlo']
+            socket_icon_description = row['Grlo']
             if row['Grlo'].strip().lower() == 'e27':
-                icon_path = 'e27.png'
+                socket_icon_path = 'e27.png'
             elif row['Grlo'].strip().lower() == 'gu10':
-                icon_path = 'gu10.png'
+                socket_icon_path = 'gu10.png'
+            elif row['Grlo'].strip().lower() == 'g9':
+                socket_icon_path = 'g9.png'
+            elif row['Grlo'].strip().lower() == 'e14':
+                socket_icon_path = 'e14.png'
 
         # Draw product details
         text_x = width * 1/3 + 40
@@ -112,10 +120,6 @@ def generate_pdf(df, output_file, title):
             c.drawString(text_x, text_y, f"{row['Ime']}")
             text_y -= line_height + text_spacing
             c.setFont("DejaVuSans", 10)
-
-        if 'Cena' in df.columns and pd.notna(row['Cena']):
-            c.drawString(text_x, text_y, f"{row['Cena']} RSD")
-            text_y -= line_height + text_spacing
 
         if 'Opis' in df.columns and pd.notna(row['Opis']):
             description = row['Opis']
@@ -131,31 +135,41 @@ def generate_pdf(df, output_file, title):
                     description = description[i+1:]
                 text_y -= line_height
 
-        # Draw icon below description
-        if icon_path:
+        # Draw icons side by side below description
+        if delivery_icon_path or socket_icon_path:
             icon_size = int(container_height / 8)
             text_y -= text_spacing
-            draw_icon(c, text_x, text_y - icon_size - 2, icon_size, icon_path)  # Draw icon after setting background color
-            text_y -= icon_size + text_spacing
+            icon_x = text_x
 
-            # Add small text below icon
-            c.setFont("DejaVuSans", 8)
-            c.drawString(text_x, text_y - 4, icon_description.upper())
-            text_y -= line_height
+            # Draw delivery icon and text
+            if delivery_icon_path:
+                draw_icon(c, icon_x, text_y - icon_size - 2, icon_size, delivery_icon_path)
+                c.setFont("DejaVuSans", 8)
+                c.drawString(icon_x-8, text_y - icon_size - 14, delivery_icon_description)
+                icon_x += icon_size + 20  # Adjust space between icons
+
+            # Draw socket icon and text
+            if socket_icon_path:
+                draw_icon(c, icon_x, text_y - icon_size - 2, icon_size, socket_icon_path)
+                c.setFont("DejaVuSans", 8)
+                c.drawString(icon_x, text_y - icon_size - 14, socket_icon_description.upper())
+
+            text_y -= icon_size + text_spacing + 20  # Adjust for the next row
 
         y -= container_height  # Move to the next product position
 
         # Check if enough space is available for the next item
         if y < container_height:
             c.showPage()  # Start new page if not enough space
-            y = height - 40  # Reset Y position for new page, but do not add title or subtitle
+            y = height - 20  # Reset Y position for new page, but do not add title or subtitle
             c.setFont("DejaVuSans", 10)
 
     c.save()
 
+
 def main():
-    input_csv = 'SpoljnaRasveta2.csv'
-    output_pdf = 'Final6.pdf'  # Output PDF file name
+    input_csv = 'SpoljnaRasveta.csv'
+    output_pdf = 'Final7.pdf'  # Output PDF file name
 
     df = read_csv(input_csv)
 
