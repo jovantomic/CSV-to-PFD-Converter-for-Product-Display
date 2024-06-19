@@ -57,18 +57,29 @@ def draw_icon(c, x, y, size, icon_path):
     c.rect(x - 1, y - 1, size + 2, size + 2, stroke=True, fill=False)
     c.drawImage(icon_reader, x, y, width=size, height=size, mask='auto')
 
-
 def draw_icon_with_text(c, x, y, size, icon_path, text):
-    """Draw an icon with text below it."""
+    """Draw an icon with text below it and a border around the icon."""
     icon = PILImage.open(icon_path)
     icon = icon.resize((size, size), PILImage.LANCZOS)
     icon_io = BytesIO()
     icon.save(icon_io, format="PNG")
     icon_io.seek(0)
     icon_reader = ImageReader(icon_io)
+    
+    # Draw border
+    c.setStrokeColor(colors.black)
+    c.setLineWidth(1)
+    c.rect(x - 1, y - 1, size + 2, size + 2, stroke=True, fill=False)
+    
+    # Draw image
     c.drawImage(icon_reader, x, y, width=size, height=size, mask='auto')
+    
+    # Draw text
     c.setFont("DejaVuSans", 8)
-    c.drawCentredString(x + size / 2, y - 10, text)
+    text_lines = text.split('\n')
+    for i, line in enumerate(text_lines):
+        c.drawCentredString(x + size / 2, y - 10 - (i * 10), line)
+
 
 def generate_pdf(df, output_file, title):
     """Generate PDF from DataFrame."""
@@ -150,19 +161,26 @@ def generate_pdf(df, output_file, title):
             ('IP', 'IP.png')
         ]
 
-        # Draw icons side by side below description
+        # Draw icons side by side at the bottom of the container
         icon_size = int(container_height / 8)
-        text_y -= text_spacing
         icon_x = text_x
+        icon_y = y - container_height + 45  # Align icons at the bottom of the container
 
         for column, icon in icons:
             if column in df.columns and pd.notna(row[column]):
-                icon_path = icon if isinstance(icon, str) else icon.get(row[column].strip().lower(), None)
-                if icon_path:
-                    draw_icon_with_text(c, icon_x, text_y - icon_size - 2, icon_size, icon_path, row[column])
-                    icon_x += icon_size + 10  # Adjust space between icons
+                if row[column].strip().lower() == 'ne':
+                    continue
 
-        text_y -= icon_size + text_spacing + 20  # Adjust for the next row
+                icon_path = icon if isinstance(icon, str) else icon.get(row[column].strip().lower(), None)
+                text = row[column] if row[column].strip().lower() != 'da' else column
+
+                # Special handling for Rok Isporuke to split text into two lines
+                if column == 'Rok Isporuke':
+                    text = f"do\n{row[column]}"
+
+                if icon_path:
+                    draw_icon_with_text(c, icon_x, icon_y - icon_size - 2, icon_size, icon_path, text)
+                    icon_x += icon_size + 10  # Adjust space between icons
 
         y -= container_height  # Move to the next product position
 
@@ -174,20 +192,6 @@ def generate_pdf(df, output_file, title):
 
     c.save()
 
-def main():
-    input_csv = 'SpoljnaRasveta.csv'
-    output_pdf = 'Final7.pdf'  # Output PDF file name
-
-    df = read_csv(input_csv)
-
-    # Extract the base name of the CSV file without the extension for the title
-    title = os.path.splitext(os.path.basename(input_csv))[0]
-
-    generate_pdf(df, output_pdf, title)
-    print(f"PDF file '{output_pdf}' has been generated.")
-
-if __name__ == "__main__":
-    main()
 
 
 def main():
