@@ -145,7 +145,7 @@ def generate_pdf(df, output_file, title):
             if delivery_icon_path:
                 draw_icon(c, icon_x, text_y - icon_size - 2, icon_size, delivery_icon_path)
                 c.setFont("DejaVuSans", 8)
-                c.drawString(icon_x-8, text_y - icon_size - 14, delivery_icon_description)
+                c.drawString(icon_x-10, text_y - icon_size - 14, delivery_icon_description)
                 icon_x += icon_size + 20  # Adjust space between icons
 
             # Draw socket icon and text
