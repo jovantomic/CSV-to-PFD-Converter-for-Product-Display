@@ -45,6 +45,8 @@ def draw_icon(c, x, y, size, icon_path):
     c.rect(x - 1, y - 1, size + 2, size + 2, stroke=True, fill=False)
     c.drawImage(icon_reader, x, y, width=size, height=size, mask='auto')
 
+
+
 def generate_pdf(df, output_file, title):
     """Generate PDF from DataFrame."""
     c = canvas.Canvas(output_file, pagesize=letter)
@@ -58,13 +60,17 @@ def generate_pdf(df, output_file, title):
     c.setFont("DejaVuSans-Bold", 16)
     c.drawCentredString(width / 2.0, height - 40, title)
 
+    # Add subtitle on the first page
+    c.setFont("DejaVuSans-Bold", 12)
+    c.drawCentredString(width / 2.0, height - 60, "Leuci Centar")
+
     c.setFont("DejaVuSans", 10)
 
-    y = height - 80  # Adjust Y position for content
+    y = height - 100  # Adjust Y position for content, accounting for the subtitle
     line_height = 12  # Height for each line of text
     text_spacing = 8  # Spacing between different text blocks
 
-    container_height = 180
+    container_height = 200
 
     colors_cycle = [colors.HexColor("#E0F7FA"), colors.white]  # Light blue and white
     color_index = 0
@@ -88,7 +94,9 @@ def generate_pdf(df, output_file, title):
 
         # Determine the icon based on the 'Grlo' column
         icon_path = None
+        icon_description = ''
         if 'Grlo' in df.columns and pd.notna(row['Grlo']):
+            icon_description = row['Grlo']
             if row['Grlo'].strip().lower() == 'e27':
                 icon_path = 'e27.png'
             elif row['Grlo'].strip().lower() == 'gu10':
@@ -127,22 +135,27 @@ def generate_pdf(df, output_file, title):
         if icon_path:
             icon_size = int(container_height / 8)
             text_y -= text_spacing
-            draw_icon(c, text_x, text_y - icon_size - 2, icon_size, icon_path)
+            draw_icon(c, text_x, text_y - icon_size - 2, icon_size, icon_path)  # Draw icon after setting background color
             text_y -= icon_size + text_spacing
+
+            # Add small text below icon
+            c.setFont("DejaVuSans", 8)
+            c.drawString(text_x, text_y - 4, icon_description.upper())
+            text_y -= line_height
 
         y -= container_height  # Move to the next product position
 
         # Check if enough space is available for the next item
         if y < container_height:
             c.showPage()  # Start new page if not enough space
-            y = height - 40  # Reset Y position for new page, but do not add title
+            y = height - 40  # Reset Y position for new page, but do not add title or subtitle
             c.setFont("DejaVuSans", 10)
 
     c.save()
 
 def main():
     input_csv = 'SpoljnaRasveta2.csv'
-    output_pdf = 'Final5.pdf'  # Output PDF file name
+    output_pdf = 'Final6.pdf'  # Output PDF file name
 
     df = read_csv(input_csv)
 
