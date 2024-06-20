@@ -1,3 +1,5 @@
+import datetime
+from datetime import datetime
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -9,6 +11,13 @@ import requests
 from PIL import Image as PILImage
 from io import BytesIO
 import os
+
+def draw_multiline_text(c, text, x, y, line_height=12):
+    """Draw multi-line text on the canvas."""
+    for line in text.split('\n'):
+        c.drawString(x, y, line)
+        y -= line_height
+    return y
 
 def read_csv(file_path):
     """Read CSV file and return a DataFrame."""
@@ -82,7 +91,6 @@ def draw_icon_with_text(c, x, y, size, icon_path, text):
 
 
 def generate_pdf(df, output_file, title):
-    """Generate PDF from DataFrame."""
     c = canvas.Canvas(output_file, pagesize=letter)
     width, height = letter
 
@@ -98,7 +106,21 @@ def generate_pdf(df, output_file, title):
     c.setFont("DejaVuSans-Bold", 16)
     c.drawCentredString(width / 2.0, height - 50, "Leuci Centar")
 
+    # Add contact information on the left
+    c.setFont("DejaVuSans", 10)
+    contact_text = "+38163 212 212\nleucibeograd@gmail.com"
+    draw_multiline_text(c, contact_text, 30, height - 20, line_height=12)
+
+    # Add information text on the right
+    info_text = "Za cene i količinu pozovite \nili pošaljite upit putem mejla"
+    info_y = draw_multiline_text(c, info_text, width - 150, height - 20, line_height=12)
+
+    # Add creation date at the bottom of information text
+    creation_date = f"Datum kreiranja: {datetime.now().strftime('%Y-%m-%d')}"
+    c.drawString(width - 150, info_y - 12, creation_date)
+
     c.setFont("DejaVuSans", 12)
+
 
     y = height - 60  # Adjust Y position for content, accounting for the subtitle
     line_height = 12  # Height for each line of text
