@@ -186,7 +186,7 @@ def generate_pdf(df, output_file, title):
         # Draw icons side by side at the bottom of the container
         icon_size = int(container_height / 8)
         icon_x = text_x
-        icon_y = y - container_height + 45  # Align icons at the bottom of the container
+        icon_y = y - container_height + 45  # Align icons at the bottom of the containerubicu se 
 
         for column, icon in icons:
             if column in df.columns and pd.notna(row[column]):
