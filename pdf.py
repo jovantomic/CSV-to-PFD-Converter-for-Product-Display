@@ -183,7 +183,7 @@ def generate_pdf(df, output_file, title):
             ('IP', 'IP.png')
         ]
 
-        # Draw icons side by side at the bottom of sdasdaasdasthe container
+        # Draw icons side by side at the bottom of sdasdaasdasthe containerS
         icon_size = int(container_height / 8)
         icon_x = text_x
         icon_y = y - container_height + 45  # Align icodaadsns at the botasdasdasdtom of thasdassaasdasdasddasdasde containerubicu se  zadasadselenui kvadratic danas nisam kucao
