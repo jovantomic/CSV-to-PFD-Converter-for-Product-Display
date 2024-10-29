@@ -11,6 +11,7 @@ import requests
 from PIL import Image as PILImage
 from io import BytesIO
 import os
+import sys;
 
 def draw_multiline_text(c, text, x, y, line_height=12):
     """Draw multi-line text on the canvas."""
@@ -217,9 +218,15 @@ def generate_pdf(df, output_file, title):
 
 
 def main():
-    input_csv = 'SpoljnaRasveta.csv'
-    output_pdf = 'Final7.pdf'  # Output PDF file name
+    #input_csv = ""
+    try:
+        input_csv = sys.argv[1]
+    except IndexError:
+        print("No file dropped")
 
+    x = input("enter to close")
+    output_pdf = sys.argv[1] + ".pdf"  # Output PDF file name
+    
     df = read_csv(input_csv)
 
     # Extract the base name of the CSV file without the extension for the title
@@ -227,6 +234,7 @@ def main():
 
     generate_pdf(df, output_pdf, title)
     print(f"PDF file '{output_pdf}' has been generated.")
+    
 
 if __name__ == "__main__":
     main()
